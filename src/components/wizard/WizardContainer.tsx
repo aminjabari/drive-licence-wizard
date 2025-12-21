@@ -9,6 +9,7 @@ import { Step3Process } from './Step3Process';
 import { Step4Registration } from './Step4Registration';
 import { getAssessmentFromWordPress } from '@/services/wordpressApi';
 import { useWordPressUser } from '@/hooks/useWordPressUser';
+import { useWordPressEvents } from '@/hooks/useWordPressEvents';
 
 function WizardContent() {
   const [searchParams] = useSearchParams();
@@ -130,15 +131,25 @@ function WizardContent() {
     setShowWelcome(false);
   };
 
+  const { dispatch: dispatchWpEvent } = useWordPressEvents();
+
   const handleNext = () => {
     if (currentStep < 4) {
-      setCurrentStep(currentStep + 1);
+      const newStep = currentStep + 1;
+      setCurrentStep(newStep);
+      
+      // Dispatch step_changed event to WordPress
+      dispatchWpEvent('step_changed', { currentStep: newStep });
     }
   };
 
   const handlePrev = () => {
     if (currentStep > 1) {
-      setCurrentStep(currentStep - 1);
+      const newStep = currentStep - 1;
+      setCurrentStep(newStep);
+      
+      // Dispatch step_changed event to WordPress
+      dispatchWpEvent('step_changed', { currentStep: newStep });
     }
   };
 
