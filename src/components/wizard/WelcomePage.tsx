@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -78,9 +78,13 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
     onStart();
   };
 
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
   const handleProvinceSelect = (province: string) => {
     setLocalProvince(province);
     setDrawerOpen(false);
+    // Focus on the submit button after province selection
+    setTimeout(() => buttonRef.current?.focus(), 100);
   };
 
   const isValid = localName.trim().length > 0 && isPhoneValid && localProvince.length > 0 && !isCheckingPhone;
@@ -188,6 +192,7 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
       {/* Footer Button */}
       <div className="p-6">
         <Button
+          ref={buttonRef}
           onClick={handleStart}
           disabled={!isValid}
           className="w-full h-12 rounded-full text-lg font-medium"
