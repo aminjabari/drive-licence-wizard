@@ -116,6 +116,14 @@ serve(async (req) => {
             },
           }
         );
+        
+        // For get-assessment, 404 means no assessment found - return null instead of error
+        if (response.status === 404) {
+          return new Response(
+            JSON.stringify(null),
+            { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
         break;
 
       default:
