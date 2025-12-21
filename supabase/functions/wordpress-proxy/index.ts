@@ -59,13 +59,26 @@ serve(async (req) => {
           }
         );
 
+        const extractExistingId = (raw: any): string | number | undefined => {
+          if (!raw) return undefined;
+
+          // Some APIs return { success: true, data: {...} }
+          const candidate = (typeof raw === 'object' && raw !== null && 'data' in raw) ? raw.data : raw;
+
+          // Or return an array
+          if (Array.isArray(candidate)) return candidate?.[0]?.id;
+
+          return candidate?.id;
+        };
+
         if (checkResponse.ok) {
           const existingData = await checkResponse.json();
-          
-          if (existingData && existingData.id) {
+          const existingId = extractExistingId(existingData);
+
+          if (existingId) {
             // Update existing assessment
             response = await fetch(
-              `${WORDPRESS_API_URL}/wp-json/sadar/v1/assessments/${existingData.id}`,
+              `${WORDPRESS_API_URL}/wp-json/sadar/v1/assessments/${existingId}`,
               {
                 method: 'PUT',
                 headers: {
