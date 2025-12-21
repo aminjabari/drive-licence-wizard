@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { useWizard } from './WizardContext';
 import { WizardFooter } from './WizardFooter';
 import registerVideo from '@/assets/register.mp4';
+import { useWordPressEvents } from '@/hooks/useWordPressEvents';
 
 interface Step4RegistrationProps {
   onPrev: () => void;
@@ -9,6 +10,7 @@ interface Step4RegistrationProps {
 
 export function Step4Registration({ onPrev }: Step4RegistrationProps) {
   const { markStepComplete } = useWizard();
+  const { dispatch: dispatchWpEvent } = useWordPressEvents();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
@@ -23,6 +25,9 @@ export function Step4Registration({ onPrev }: Step4RegistrationProps) {
   }, []);
 
   const handleRegister = () => {
+    // Dispatch registration_clicked event to WordPress
+    dispatchWpEvent('registration_clicked');
+    
     markStepComplete(4);
     window.open('https://sadar.ir', '_blank');
   };

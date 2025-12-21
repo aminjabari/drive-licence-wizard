@@ -13,6 +13,7 @@ import { usePhoneValidation } from '@/hooks/usePhoneValidation';
 import { useWordPressUser } from '@/hooks/useWordPressUser';
 import { getAssessmentFromWordPress } from '@/services/wordpressApi';
 import { ExistingAssessmentDialog } from './ExistingAssessmentDialog';
+import { dispatchToWordPress } from '@/hooks/useWordPressEvents';
 
 interface WelcomePageProps {
   onStart: () => void;
@@ -74,7 +75,19 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
       }
     }
     
-    setUserInfo({ fullName: localName, phoneNumber: sanitizedPhone, province: localProvince });
+    const newUserInfo = { fullName: localName, phoneNumber: sanitizedPhone, province: localProvince };
+    setUserInfo(newUserInfo);
+    
+    // Dispatch welcome_started event to WordPress
+    dispatchToWordPress({
+      action: 'welcome_started',
+      userInfo: newUserInfo,
+      assessmentAnswers: {},
+      isEligible: null,
+      currentStep: 1,
+      timestamp: new Date().toISOString(),
+    });
+    
     onStart();
   };
 

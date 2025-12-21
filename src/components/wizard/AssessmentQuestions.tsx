@@ -3,6 +3,7 @@ import { Check, X, AlertTriangle } from 'lucide-react';
 import { useWizard } from './WizardContext';
 import { cn } from '@/lib/utils';
 import { saveAssessmentToWordPress } from '@/services/wordpressApi';
+import { useWordPressEvents } from '@/hooks/useWordPressEvents';
 
 interface Option {
   id: string;
@@ -67,6 +68,7 @@ interface AssessmentQuestionsProps {
 
 export function AssessmentQuestions({ onComplete, onDisqualify }: AssessmentQuestionsProps) {
   const { currentQuestion, setCurrentQuestion, assessmentAnswers, setAssessmentAnswers, userInfo } = useWizard();
+  const { dispatch: dispatchWpEvent } = useWordPressEvents();
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [isDisqualified, setIsDisqualified] = useState(false);
   const [disqualifyMessage, setDisqualifyMessage] = useState<string>('');
@@ -121,6 +123,13 @@ export function AssessmentQuestions({ onComplete, onDisqualify }: AssessmentQues
       } else {
         // Save to backend when assessment is complete
         await saveAssessmentToBackend(newAnswers as Record<string, string>, true);
+        
+        // Dispatch assessment_completed event to WordPress
+        dispatchWpEvent('assessment_completed', {
+          assessmentAnswers: newAnswers as Record<string, string>,
+          isEligible: true,
+        });
+        
         onComplete(true);
       }
     }, 300);
