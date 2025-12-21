@@ -11,7 +11,7 @@ import { ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePhoneValidation } from '@/hooks/usePhoneValidation';
 import { useWordPressUser } from '@/hooks/useWordPressUser';
-import { supabase } from '@/integrations/supabase/client';
+import { getAssessmentFromWordPress } from '@/services/wordpressApi';
 import { ExistingAssessmentDialog } from './ExistingAssessmentDialog';
 
 interface WelcomePageProps {
@@ -55,18 +55,14 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
   const handleStart = async () => {
     if (!validatePhone()) return;
     
-    // If user is not logged in via WordPress, check if phone exists in database
+    // If user is not logged in via WordPress, check if phone exists in WordPress database
     if (!isLoggedIn) {
       setIsCheckingPhone(true);
       try {
-        const { data, error } = await supabase
-          .from('user_assessments')
-          .select('id')
-          .eq('phone_number', sanitizedPhone)
-          .maybeSingle();
+        const result = await getAssessmentFromWordPress(sanitizedPhone);
 
-        if (!error && data) {
-          // Phone exists in database, show dialog
+        if (result.success && result.data && result.data.id) {
+          // Phone exists in WordPress database, show dialog
           setShowExistingDialog(true);
           setIsCheckingPhone(false);
           return;
