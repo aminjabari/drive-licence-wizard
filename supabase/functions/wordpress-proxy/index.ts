@@ -132,12 +132,21 @@ serve(async (req) => {
         
         // For get-assessment, 404 means no assessment found - return null instead of error
         if (response.status === 404) {
+          console.log('[get-assessment] No assessment found for phone:', payload.phone_number);
           return new Response(
             JSON.stringify(null),
             { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
-        break;
+
+        // Log successful response for debugging
+        const getAssessmentData = await response.json();
+        console.log('[get-assessment] WordPress response:', JSON.stringify(getAssessmentData));
+        
+        return new Response(
+          JSON.stringify(getAssessmentData),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
 
       default:
         return new Response(
