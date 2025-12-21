@@ -9,7 +9,6 @@ import { Step3Process } from './Step3Process';
 import { Step4Registration } from './Step4Registration';
 import { getAssessmentFromWordPress } from '@/services/wordpressApi';
 import { useWordPressUser } from '@/hooks/useWordPressUser';
-import { supabase } from '@/integrations/supabase/client';
 
 function WizardContent() {
   const [searchParams] = useSearchParams();
@@ -48,24 +47,16 @@ function WizardContent() {
     }
   }, [isLoggedIn, wpUser, wpDataChecked]);
 
-  // Check assessment from Supabase for WordPress logged-in user
+  // Check assessment from WordPress for logged-in user
   const checkWpUserAssessment = async (phoneNumber: string) => {
     if (!phoneNumber) return;
     
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
-        .from('user_assessments')
-        .select('*')
-        .eq('phone_number', phoneNumber)
-        .maybeSingle();
+      const result = await getAssessmentFromWordPress(phoneNumber);
 
-      if (error) {
-        console.error('Error fetching assessment:', error);
-        return;
-      }
-
-      if (data) {
+      if (result.success && result.data) {
+        const data = result.data;
         // Pre-fill user info
         setUserInfo({
           fullName: data.full_name || '',

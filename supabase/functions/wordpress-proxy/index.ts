@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,8 +20,6 @@ serve(async (req) => {
     const WORDPRESS_API_URL = Deno.env.get('WORDPRESS_API_URL');
     const WORDPRESS_USERNAME = Deno.env.get('WORDPRESS_USERNAME');
     const WORDPRESS_API_KEY = Deno.env.get('WORDPRESS_API_KEY');
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL');
-    const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
     if (!WORDPRESS_API_URL || !WORDPRESS_USERNAME || !WORDPRESS_API_KEY) {
       console.error('Missing WordPress credentials');
@@ -31,9 +28,6 @@ serve(async (req) => {
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
-
-    // Create Supabase client for database operations
-    const supabase = createClient(SUPABASE_URL!, SUPABASE_SERVICE_ROLE_KEY!);
 
     // Create Basic Auth header
     const credentials = btoa(`${WORDPRESS_USERNAME}:${WORDPRESS_API_KEY.replace(/\s/g, '')}`);
@@ -53,29 +47,7 @@ serve(async (req) => {
         );
 
       case 'save-assessment':
-        // Save to Supabase using upsert (update if exists, insert if not)
-        const { error: supabaseError } = await supabase
-          .from('user_assessments')
-          .upsert(
-            {
-              phone_number: payload.phone_number,
-              full_name: payload.full_name,
-              province: payload.province || null,
-              is_eligible: payload.is_eligible,
-              assessment_answers: payload.assessment_answers,
-              updated_at: new Date().toISOString()
-            },
-            { 
-              onConflict: 'phone_number',
-              ignoreDuplicates: false 
-            }
-          );
-
-        if (supabaseError) {
-          console.error('Supabase upsert error:', supabaseError);
-        }
-
-        // Also save to WordPress
+        // Check if assessment exists in WordPress
         const checkResponse = await fetch(
           `${WORDPRESS_API_URL}/wp-json/sadar/v1/assessments?phone_number=${encodeURIComponent(payload.phone_number)}`,
           {
