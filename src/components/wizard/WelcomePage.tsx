@@ -145,16 +145,12 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
                   id="province"
                   placeholder="انتخاب استان"
                   value={localProvince}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (iranProvinces.includes(value)) {
-                      setLocalProvince(value);
-                    }
-                  }}
+                  readOnly
                   className="text-right bg-card border-border h-12 rounded-full px-6 cursor-pointer"
-                  autoComplete="address-level1"
+                  autoComplete="off"
                   name="address-level1"
                   onClick={() => setDrawerOpen(true)}
+                  onFocus={() => setDrawerOpen(true)}
                 />
                 <ChevronDown className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               </div>
