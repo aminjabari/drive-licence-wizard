@@ -6,13 +6,14 @@ interface VideoContentStepProps {
   headerImage?: string;
   headerImageAlt?: string;
   videoSrc?: string;
+  autoPlay?: boolean;
 }
 
-export function VideoContentStep({ title, description, headerImage, headerImageAlt, videoSrc }: VideoContentStepProps) {
+export function VideoContentStep({ title, description, headerImage, headerImageAlt, videoSrc, autoPlay = true }: VideoContentStepProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current && videoSrc) {
+    if (videoRef.current && videoSrc && autoPlay) {
       videoRef.current.play().catch(() => {
         if (videoRef.current) {
           videoRef.current.muted = true;
@@ -20,7 +21,7 @@ export function VideoContentStep({ title, description, headerImage, headerImageA
         }
       });
     }
-  }, [videoSrc]);
+  }, [videoSrc, autoPlay]);
 
   return (
     <div className="flex flex-col flex-1 min-h-0 overflow-y-auto">

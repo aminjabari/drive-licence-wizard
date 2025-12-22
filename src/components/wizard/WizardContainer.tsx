@@ -25,7 +25,8 @@ function WizardContent() {
     setIsEligible, 
     setAssessmentAnswers,
     setAssessmentStarted,
-    markStepComplete
+    markStepComplete,
+    setEnteredViaQueryParam
   } = useWizard();
 
   // Check for step query param on mount
@@ -36,6 +37,7 @@ function WizardContent() {
       if (step >= 1 && step <= 4) {
         setShowWelcome(false);
         setCurrentStep(step);
+        setEnteredViaQueryParam(true);
       }
     }
   }, []);

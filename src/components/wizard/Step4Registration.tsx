@@ -9,12 +9,12 @@ interface Step4RegistrationProps {
 }
 
 export function Step4Registration({ onPrev }: Step4RegistrationProps) {
-  const { markStepComplete } = useWizard();
+  const { markStepComplete, enteredViaQueryParam } = useWizard();
   const { dispatch: dispatchWpEvent } = useWordPressEvents();
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
-    if (videoRef.current) {
+    if (videoRef.current && !enteredViaQueryParam) {
       videoRef.current.play().catch(() => {
         if (videoRef.current) {
           videoRef.current.muted = true;
@@ -22,7 +22,7 @@ export function Step4Registration({ onPrev }: Step4RegistrationProps) {
         }
       });
     }
-  }, []);
+  }, [enteredViaQueryParam]);
 
   const handleRegister = () => {
     // Dispatch registration_clicked event to WordPress
