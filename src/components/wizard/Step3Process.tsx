@@ -9,7 +9,7 @@ interface Step3ProcessProps {
 }
 
 export function Step3Process({ onNext, onPrev }: Step3ProcessProps) {
-  const { markStepComplete } = useWizard();
+  const { markStepComplete, enteredViaQueryParam } = useWizard();
 
   const handleNext = () => {
     markStepComplete(3);
@@ -21,6 +21,7 @@ export function Step3Process({ onNext, onPrev }: Step3ProcessProps) {
       <VideoContentStep
         title="مراحل کارت هوشمند"
         videoSrc={stepsVideo}
+        autoPlay={!enteredViaQueryParam}
         description={`📋 مراحل کارت هوشمند رانندگی شامل سه مرحله‌ی اصلی هستند:
 
 1️⃣ شرکت در آزمون کارت هوشمند 📝 و قبولی در این آزمون (ثبت‌نام از سایت سدار)

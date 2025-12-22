@@ -29,6 +29,8 @@ interface WizardContextType {
   currentQuestion: number;
   setCurrentQuestion: (question: number) => void;
   resetAssessment: () => void;
+  enteredViaQueryParam: boolean;
+  setEnteredViaQueryParam: (entered: boolean) => void;
 }
 
 const WizardContext = createContext<WizardContextType | undefined>(undefined);
@@ -41,6 +43,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   const [isEligible, setIsEligible] = useState<boolean | null>(null);
   const [assessmentStarted, setAssessmentStarted] = useState(false);
   const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [enteredViaQueryParam, setEnteredViaQueryParam] = useState(false);
 
   const markStepComplete = (step: number) => {
     if (!completedSteps.includes(step)) {
@@ -74,6 +77,8 @@ export function WizardProvider({ children }: { children: ReactNode }) {
         currentQuestion,
         setCurrentQuestion,
         resetAssessment,
+        enteredViaQueryParam,
+        setEnteredViaQueryParam,
       }}
     >
       {children}
