@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
 import { WizardProvider, useWizard, AssessmentAnswers } from './WizardContext';
 import { WelcomePage } from './WelcomePage';
 import { WizardHeader } from './WizardHeader';
@@ -10,9 +9,10 @@ import { Step4Registration } from './Step4Registration';
 import { getAssessmentFromWordPress } from '@/services/wordpressApi';
 import { useWordPressUser } from '@/hooks/useWordPressUser';
 import { useWordPressEvents } from '@/hooks/useWordPressEvents';
+import { useQueryParams } from '@/hooks/useQueryParams';
 
 function WizardContent() {
-  const [searchParams] = useSearchParams();
+  const { get: getQueryParam } = useQueryParams();
   const [showWelcome, setShowWelcome] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [wpDataChecked, setWpDataChecked] = useState(false);
@@ -28,9 +28,9 @@ function WizardContent() {
     markStepComplete
   } = useWizard();
 
-  // Check for step query param
+  // Check for step query param on mount
   useEffect(() => {
-    const stepParam = searchParams.get('step');
+    const stepParam = getQueryParam('step');
     if (stepParam) {
       const step = parseInt(stepParam, 10);
       if (step >= 1 && step <= 4) {
@@ -38,7 +38,7 @@ function WizardContent() {
         setCurrentStep(step);
       }
     }
-  }, [searchParams, setCurrentStep]);
+  }, []);
 
   // Auto-check WordPress user data on mount
   useEffect(() => {
