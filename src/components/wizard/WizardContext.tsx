@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import { saveWithExpiry, getWithExpiry, getWizardStorageKey } from '@/hooks/useLocalStorageWithExpiry';
 
 export interface UserInfo {
   fullName: string;
@@ -11,6 +12,14 @@ export interface AssessmentAnswers {
   militaryStatus?: string;
   education?: string;
   employment?: string;
+}
+
+interface WizardStoredData {
+  userInfo: UserInfo;
+  assessmentAnswers: AssessmentAnswers;
+  isEligible: boolean | null;
+  currentStep: number;
+  completedSteps: number[];
 }
 
 interface WizardContextType {
@@ -31,6 +40,8 @@ interface WizardContextType {
   resetAssessment: () => void;
   enteredViaQueryParam: boolean;
   setEnteredViaQueryParam: (entered: boolean) => void;
+  loadFromLocalStorage: (phoneNumber?: string) => WizardStoredData | null;
+  saveToLocalStorage: () => void;
 }
 
 const WizardContext = createContext<WizardContextType | undefined>(undefined);
@@ -59,6 +70,48 @@ export function WizardProvider({ children }: { children: ReactNode }) {
     setCompletedSteps(completedSteps.filter(s => s !== 1));
   };
 
+  // Load data from localStorage
+  const loadFromLocalStorage = useCallback((phoneNumber?: string): WizardStoredData | null => {
+    const key = getWizardStorageKey(phoneNumber);
+    const storedData = getWithExpiry<WizardStoredData>(key);
+    
+    if (storedData) {
+      setUserInfo(storedData.userInfo);
+      setAssessmentAnswers(storedData.assessmentAnswers);
+      setIsEligible(storedData.isEligible);
+      setCurrentStep(storedData.currentStep);
+      setCompletedSteps(storedData.completedSteps);
+      if (storedData.isEligible !== null) {
+        setAssessmentStarted(true);
+      }
+    }
+    
+    return storedData;
+  }, []);
+
+  // Save data to localStorage
+  const saveToLocalStorage = useCallback(() => {
+    if (!userInfo.phoneNumber) return;
+    
+    const key = getWizardStorageKey(userInfo.phoneNumber);
+    const dataToStore: WizardStoredData = {
+      userInfo,
+      assessmentAnswers,
+      isEligible,
+      currentStep,
+      completedSteps,
+    };
+    
+    saveWithExpiry(key, dataToStore);
+  }, [userInfo, assessmentAnswers, isEligible, currentStep, completedSteps]);
+
+  // Auto-save to localStorage when data changes
+  useEffect(() => {
+    if (userInfo.phoneNumber) {
+      saveToLocalStorage();
+    }
+  }, [userInfo, assessmentAnswers, isEligible, currentStep, completedSteps, saveToLocalStorage]);
+
   return (
     <WizardContext.Provider
       value={{
@@ -79,6 +132,8 @@ export function WizardProvider({ children }: { children: ReactNode }) {
         resetAssessment,
         enteredViaQueryParam,
         setEnteredViaQueryParam,
+        loadFromLocalStorage,
+        saveToLocalStorage,
       }}
     >
       {children}

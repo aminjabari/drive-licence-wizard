@@ -29,7 +29,7 @@ function WizardContent() {
     setEnteredViaQueryParam
   } = useWizard();
 
-  // Check for step query param on mount
+  // Check for step query param or localStorage on mount
   useEffect(() => {
     const stepParam = getQueryParam('step');
     if (stepParam) {
