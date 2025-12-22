@@ -20,7 +20,7 @@ interface WelcomePageProps {
 }
 
 export function WelcomePage({ onStart }: WelcomePageProps) {
-  const { userInfo, setUserInfo } = useWizard();
+  const { userInfo, setUserInfo, loadFromLocalStorage } = useWizard();
   const { isLoggedIn } = useWordPressUser();
   const [searchParams] = useSearchParams();
   
@@ -29,6 +29,7 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showExistingDialog, setShowExistingDialog] = useState(false);
   const [isCheckingPhone, setIsCheckingPhone] = useState(false);
+  const [localStorageChecked, setLocalStorageChecked] = useState(false);
   
   const { 
     phone: localPhone, 
@@ -52,6 +53,23 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
       setLocalProvince(provinceParam);
     }
   }, [searchParams]);
+
+  // Check localStorage when phone number is valid
+  useEffect(() => {
+    if (isPhoneValid && sanitizedPhone && !localStorageChecked && !isLoggedIn) {
+      const storedData = loadFromLocalStorage(sanitizedPhone);
+      if (storedData) {
+        setLocalName(storedData.userInfo.fullName);
+        setLocalProvince(storedData.userInfo.province);
+      }
+      setLocalStorageChecked(true);
+    }
+  }, [isPhoneValid, sanitizedPhone, localStorageChecked, isLoggedIn, loadFromLocalStorage]);
+
+  // Reset localStorage check when phone changes
+  useEffect(() => {
+    setLocalStorageChecked(false);
+  }, [sanitizedPhone]);
 
   const handleStart = async () => {
     if (!validatePhone()) return;
