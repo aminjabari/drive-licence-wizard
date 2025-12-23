@@ -136,6 +136,13 @@ function WizardContent() {
   const { dispatch: dispatchWpEvent } = useWordPressEvents();
 
   const handleNext = () => {
+    // If user data is missing, redirect to welcome page
+    if (!userInfo.phoneNumber) {
+      setShowWelcome(true);
+      setCurrentStep(1);
+      return;
+    }
+    
     if (currentStep < 4) {
       const newStep = currentStep + 1;
       setCurrentStep(newStep);
@@ -146,6 +153,13 @@ function WizardContent() {
   };
 
   const handlePrev = () => {
+    // If user data is missing, redirect to welcome page
+    if (!userInfo.phoneNumber) {
+      setShowWelcome(true);
+      setCurrentStep(1);
+      return;
+    }
+    
     if (currentStep > 1) {
       const newStep = currentStep - 1;
       setCurrentStep(newStep);
