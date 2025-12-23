@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useWizard } from './WizardContext';
-import welcomeHero from '@/assets/welcome-hero.png';
+import smartCard from '@/assets/smart-card.jpg';
 import sadarLogo from '@/assets/sadar-logo.png';
 import { iranProvinces } from '@/lib/iranProvinces';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
@@ -127,12 +127,12 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
         <img src={sadarLogo} alt="سدار" className="h-16 w-auto mb-4" />
         
         <img 
-          src={welcomeHero} 
+          src={smartCard} 
           alt="کارت هوشمند رانندگی" 
-          className="w-48 h-auto mb-4 rounded-lg"
+          className="w-64 h-auto mb-4 rounded-lg shadow-md"
         />
         
-        <h1 className="text-2xl font-bold text-foreground mb-4">خوش آمدید</h1>
+        <h1 className="text-xl font-bold text-foreground mb-4 text-center">راهنمای آنلاین ثبت‌نام کارت هوشمند رانندگی</h1>
         <p className="text-muted-foreground text-sm text-center mb-8 max-w-xs leading-relaxed">
           برای شروع فرآیند ثبت‌نام و ارزیابی شرایط اخذ کارت هوشمند رانندگی، لطفاً اطلاعات خود را وارد کنید.
         </p>
