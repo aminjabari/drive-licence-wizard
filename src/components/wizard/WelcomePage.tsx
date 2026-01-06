@@ -11,7 +11,7 @@ import { ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePhoneValidation } from '@/hooks/usePhoneValidation';
 import { useWordPressUser } from '@/hooks/useWordPressUser';
-import { getAssessmentFromWordPress } from '@/services/wordpressApi';
+import { getAssessmentFromWordPress } from '@/services/wordpressDirectApi';
 import { ExistingAssessmentDialog } from './ExistingAssessmentDialog';
 import { dispatchToWordPress } from '@/hooks/useWordPressEvents';
 

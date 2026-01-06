@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Check, X, AlertTriangle } from 'lucide-react';
 import { useWizard } from './WizardContext';
 import { cn } from '@/lib/utils';
-import { saveAssessmentToWordPress } from '@/services/wordpressApi';
+import { saveAssessmentToWordPress } from '@/services/wordpressDirectApi';
 import { useWordPressEvents } from '@/hooks/useWordPressEvents';
 
 interface Option {
