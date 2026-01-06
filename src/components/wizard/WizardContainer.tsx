@@ -30,6 +30,18 @@ function WizardContent() {
     setEnteredViaQueryParam
   } = useWizard();
 
+  // Preload video for step 4 when user reaches step 2 or beyond
+  const videoPreloadRef = useRef<HTMLVideoElement | null>(null);
+  useEffect(() => {
+    if (currentStep >= 2 && !videoPreloadRef.current) {
+      const video = document.createElement('video');
+      video.preload = 'auto';
+      video.src = registerVideo;
+      video.load();
+      videoPreloadRef.current = video;
+    }
+  }, [currentStep]);
+
   // Check for step query param or localStorage on mount
   useEffect(() => {
     const stepParam = getQueryParam('step');
@@ -181,18 +193,6 @@ function WizardContent() {
   if (showWelcome) {
     return <WelcomePage onStart={handleStartWizard} />;
   }
-
-  // Preload video for step 4 when user reaches step 2 or beyond
-  const videoPreloadRef = useRef<HTMLVideoElement | null>(null);
-  useEffect(() => {
-    if (currentStep >= 2 && !videoPreloadRef.current) {
-      const video = document.createElement('video');
-      video.preload = 'auto';
-      video.src = registerVideo;
-      video.load();
-      videoPreloadRef.current = video;
-    }
-  }, [currentStep]);
 
   return (
     <div className="flex flex-col h-[100dvh] bg-background max-w-[600px] mx-auto border border-border/30 shadow-sm">
