@@ -7,7 +7,7 @@ import { Step1Assessment } from './Step1Assessment';
 import { Step2Documents } from './Step2Documents';
 import { Step3Process } from './Step3Process';
 import { Step4Registration } from './Step4Registration';
-import { getAssessmentFromWordPress } from '@/services/wordpressApi';
+import { getAssessmentFromWordPress } from '@/services/wordpressDirectApi';
 import { useWordPressUser } from '@/hooks/useWordPressUser';
 import { useWordPressEvents } from '@/hooks/useWordPressEvents';
 import { useQueryParams } from '@/hooks/useQueryParams';

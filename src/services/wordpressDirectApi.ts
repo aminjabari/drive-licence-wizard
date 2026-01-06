@@ -1,4 +1,4 @@
-import { supabase } from '@/integrations/supabase/client';
+const WORDPRESS_API_URL = import.meta.env.VITE_WORDPRESS_API_URL || '';
 
 interface AssessmentData {
   phone_number: string;
@@ -19,7 +19,7 @@ interface WordPressAssessment {
   updated_at?: string;
 }
 
-type WrappedResponse<T> = { success: boolean; data?: T; error?: string };
+type WrappedResponse<T> = { success: boolean; data?: T; message?: string };
 
 function unwrapWordPressResponse<T>(result: unknown): T | null {
   if (result === null || result === undefined) return null;
@@ -32,40 +32,27 @@ function unwrapWordPressResponse<T>(result: unknown): T | null {
   return result as T;
 }
 
-// Get WordPress API credentials from edge function
-async function getWordPressCredentials(): Promise<{ url: string; username: string; apiKey: string } | null> {
-  try {
-    const { data, error } = await supabase.functions.invoke('wordpress-proxy', {
-      body: { action: 'get-credentials' }
-    });
-
-    if (error) {
-      console.error('Error getting WordPress credentials:', error);
-      return null;
-    }
-
-    return data;
-  } catch (err) {
-    console.error('Error getting WordPress credentials:', err);
-    return null;
-  }
-}
-
-// Create or update assessment in WordPress
+// Create or update assessment in WordPress (direct call)
 export async function saveAssessmentToWordPress(
   data: AssessmentData
 ): Promise<{ success: boolean; data?: WordPressAssessment; error?: string }> {
+  if (!WORDPRESS_API_URL) {
+    console.error('VITE_WORDPRESS_API_URL is not configured');
+    return { success: false, error: 'WordPress API URL not configured' };
+  }
+
   try {
-    const { data: result, error } = await supabase.functions.invoke('wordpress-proxy', {
-      body: {
-        action: 'save-assessment',
-        payload: data
-      }
+    const response = await fetch(`${WORDPRESS_API_URL}/wp-json/sadar/v1/assessments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
     });
 
-    if (error) {
-      console.error('Error saving to WordPress:', error);
-      return { success: false, error: error.message };
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error('Error saving to WordPress:', result);
+      return { success: false, error: result.message || 'WordPress API error' };
     }
 
     return { success: true, data: unwrapWordPressResponse<WordPressAssessment>(result) ?? undefined };
@@ -75,21 +62,29 @@ export async function saveAssessmentToWordPress(
   }
 }
 
-// Get assessment by phone number from WordPress
+// Get assessment by phone number from WordPress (direct call)
 export async function getAssessmentFromWordPress(
   phoneNumber: string
 ): Promise<{ success: boolean; data?: WordPressAssessment | null; error?: string }> {
-  try {
-    const { data: result, error } = await supabase.functions.invoke('wordpress-proxy', {
-      body: {
-        action: 'get-assessment',
-        payload: { phone_number: phoneNumber }
-      }
-    });
+  if (!WORDPRESS_API_URL) {
+    console.error('VITE_WORDPRESS_API_URL is not configured');
+    return { success: false, error: 'WordPress API URL not configured' };
+  }
 
-    if (error) {
-      console.error('Error getting from WordPress:', error);
-      return { success: false, error: error.message };
+  try {
+    const response = await fetch(
+      `${WORDPRESS_API_URL}/wp-json/sadar/v1/assessments?phone_number=${encodeURIComponent(phoneNumber)}`
+    );
+
+    if (response.status === 404) {
+      return { success: true, data: null };
+    }
+
+    const result = await response.json();
+
+    if (!response.ok) {
+      console.error('Error getting from WordPress:', result);
+      return { success: false, error: result.message || 'WordPress API error' };
     }
 
     return { success: true, data: unwrapWordPressResponse<WordPressAssessment>(result) };
@@ -98,4 +93,3 @@ export async function getAssessmentFromWordPress(
     return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
   }
 }
-
