@@ -3,8 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useWizard } from './WizardContext';
-import smartCard from '@/assets/smart-card.jpg';
-import sadarLogo from '@/assets/sadar-logo.png';
 import { iranProvinces } from '@/lib/iranProvinces';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
 import { ChevronDown, Check } from 'lucide-react';
@@ -124,10 +122,10 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
     <div className="flex flex-col h-[100dvh] bg-card max-w-[600px] mx-auto" dir="rtl">
       {/* Logo Section */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 pt-8">
-        <img src={sadarLogo} alt="سدار" className="h-16 w-auto mb-4" />
+        <img src="/media/images/sadar-logo.png" alt="سدار" className="h-16 w-auto mb-4" />
         
         <img 
-          src={smartCard} 
+          src="/media/images/smart-card.jpg" 
           alt="کارت هوشمند رانندگی" 
           className="w-64 h-auto mb-4 rounded-lg shadow-md"
         />
