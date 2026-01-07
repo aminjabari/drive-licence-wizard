@@ -1,5 +1,4 @@
 import { useEffect, useState, useRef } from 'react';
-import registerVideo from '@/assets/register.mp4';
 import { WizardProvider, useWizard, AssessmentAnswers } from './WizardContext';
 import { WelcomePage } from './WelcomePage';
 import { WizardHeader } from './WizardHeader';
@@ -36,7 +35,7 @@ function WizardContent() {
     if (currentStep >= 2 && !videoPreloadRef.current) {
       const video = document.createElement('video');
       video.preload = 'auto';
-      video.src = registerVideo;
+      video.src = '/media/videos/register.mp4';
       video.load();
       videoPreloadRef.current = video;
     }
