@@ -2,6 +2,7 @@ import { useRef, useEffect } from 'react';
 import { useWizard } from './WizardContext';
 import { WizardFooter } from './WizardFooter';
 import { useWordPressEvents } from '@/hooks/useWordPressEvents';
+import { getVideoUrl } from '@/lib/media';
 
 interface Step4RegistrationProps {
   onPrev: () => void;
@@ -38,7 +39,7 @@ export function Step4Registration({ onPrev }: Step4RegistrationProps) {
         <div className="w-full aspect-[16/9] flex-shrink-0 bg-secondary flex items-center justify-center relative overflow-hidden">
           <video 
             ref={videoRef}
-            src="/media/videos/register.mp4"
+            src={getVideoUrl('register')}
             controls
             className="w-full h-full object-cover"
             playsInline

@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { getImageUrl } from '@/lib/media';
 
 interface AssessmentIntroProps {
   onStart: () => void;
@@ -17,7 +18,7 @@ export function AssessmentIntro({ onStart }: AssessmentIntroProps) {
         
         <div className="flex justify-center mb-6">
           <img 
-            src="/media/images/assessment-intro.png" 
+            src={getImageUrl('assessmentIntro')} 
             alt="ارزیابی شرایط رانندگی" 
             className="w-36 h-36 object-contain"
           />

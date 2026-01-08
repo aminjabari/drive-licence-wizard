@@ -12,6 +12,7 @@ import { useWordPressUser } from '@/hooks/useWordPressUser';
 import { getAssessmentFromWordPress } from '@/services/wordpressDirectApi';
 import { ExistingAssessmentDialog } from './ExistingAssessmentDialog';
 import { dispatchToWordPress } from '@/hooks/useWordPressEvents';
+import { getImageUrl } from '@/lib/media';
 
 interface WelcomePageProps {
   onStart: () => void;
@@ -122,10 +123,10 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
     <div className="flex flex-col h-[100dvh] bg-card max-w-[600px] mx-auto" dir="rtl">
       {/* Logo Section */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 pt-8">
-        <img src="/media/images/sadar-logo.png" alt="سدار" className="h-16 w-auto mb-4" />
+        <img src={getImageUrl('logo')} alt="سدار" className="h-16 w-auto mb-4" />
         
         <img 
-          src="/media/images/smart-card.jpg" 
+          src={getImageUrl('smartCard')} 
           alt="کارت هوشمند رانندگی" 
           className="w-64 h-auto mb-4 rounded-lg shadow-md"
         />
