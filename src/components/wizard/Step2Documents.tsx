@@ -1,6 +1,7 @@
 import { VideoContentStep } from './VideoContentStep';
 import { WizardFooter } from './WizardFooter';
 import { useWizard } from './WizardContext';
+import { getVideoUrl } from '@/lib/media';
 
 interface Step2DocumentsProps {
   onNext: () => void;
@@ -19,7 +20,7 @@ export function Step2Documents({ onNext, onPrev }: Step2DocumentsProps) {
     <>
       <VideoContentStep
         title="هزینه و زمان صدور"
-        videoSrc="/media/videos/cost.mp4"
+        videoSrc={getVideoUrl('cost')}
         autoPlay={!enteredViaQueryParam}
         description={`💰 هزینه صدور کارت هوشمند رانندگی
 در حال حاضر، هزینه گرفتن کارت هوشمند رانندگی حدود ۵ تا ۷ میلیون تومان است.

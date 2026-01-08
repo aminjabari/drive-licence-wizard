@@ -10,6 +10,7 @@ import { getAssessmentFromWordPress } from '@/services/wordpressDirectApi';
 import { useWordPressUser } from '@/hooks/useWordPressUser';
 import { useWordPressEvents } from '@/hooks/useWordPressEvents';
 import { useQueryParams } from '@/hooks/useQueryParams';
+import { getVideoUrl } from '@/lib/media';
 
 function WizardContent() {
   const { get: getQueryParam } = useQueryParams();
@@ -35,7 +36,7 @@ function WizardContent() {
     if (currentStep >= 2 && !videoPreloadRef.current) {
       const video = document.createElement('video');
       video.preload = 'auto';
-      video.src = '/media/videos/register.mp4';
+      video.src = getVideoUrl('register');
       video.load();
       videoPreloadRef.current = video;
     }

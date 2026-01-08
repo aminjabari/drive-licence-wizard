@@ -1,6 +1,7 @@
 import { VideoContentStep } from './VideoContentStep';
 import { WizardFooter } from './WizardFooter';
 import { useWizard } from './WizardContext';
+import { getVideoUrl } from '@/lib/media';
 
 interface Step3ProcessProps {
   onNext: () => void;
@@ -19,7 +20,7 @@ export function Step3Process({ onNext, onPrev }: Step3ProcessProps) {
     <>
       <VideoContentStep
         title="مراحل کارت هوشمند"
-        videoSrc="/media/videos/steps.mp4"
+        videoSrc={getVideoUrl('steps')}
         autoPlay={!enteredViaQueryParam}
         description={`📋 مراحل کارت هوشمند رانندگی شامل سه مرحله‌ی اصلی هستند:
 
