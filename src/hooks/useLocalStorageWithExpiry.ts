@@ -53,7 +53,9 @@ export function removeFromStorage(key: string): void {
   }
 }
 
-// Key generator based on phone number
-export function getWizardStorageKey(phoneNumber?: string): string {
-  return phoneNumber ? `wizard_data_${phoneNumber}` : 'wizard_data_guest';
+// Fixed key for wizard data (one record per device)
+export const WIZARD_STORAGE_KEY = 'wizard_data';
+
+export function getWizardStorageKey(): string {
+  return WIZARD_STORAGE_KEY;
 }
