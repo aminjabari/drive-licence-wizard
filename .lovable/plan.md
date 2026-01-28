@@ -1,72 +1,65 @@
 
 
-## برنامه اصلاح سیستم ذخیره‌سازی LocalStorage
+## برنامه حذف بررسی لاگین و دریافت اطلاعات از دیتابیس
 
-### مشکل فعلی
-در حال حاضر، کلید ذخیره‌سازی بر اساس شماره تلفن تولید می‌شود:
-```
-wizard_data_09121234567
-wizard_data_09129876543
-wizard_data_guest
-```
-این باعث می‌شود با هر شماره تلفن جدید، یک رکورد جدید ایجاد شود.
+### خلاصه تغییرات
+حذف تمام منطق مربوط به بررسی لاگین WordPress و دریافت اطلاعات از دیتابیس. از این پس فقط localStorage برای ذخیره و بازیابی اطلاعات استفاده می‌شود.
 
-### راه‌حل
-تغییر سیستم به یک کلید ثابت برای هر دستگاه:
-```
-wizard_data
-```
+---
 
-### تغییرات مورد نیاز
+### فایل‌هایی که تغییر می‌کنند
 
-#### ۱. به‌روزرسانی `src/hooks/useLocalStorageWithExpiry.ts`
+#### ۱. `src/components/wizard/WelcomePage.tsx`
+**حذف شود:**
+- ایمپورت `useWordPressUser`
+- ایمپورت `getAssessmentFromWordPress`
+- ایمپورت `ExistingAssessmentDialog`
+- متغیر `isLoggedIn` از هوک
+- state های `showExistingDialog` و `isCheckingPhone`
+- شرط `!isLoggedIn` در useEffect بارگذاری localStorage
+- بلوک بررسی دیتابیس در `handleStart` (خطوط 75-92)
+- کامپوننت `ExistingAssessmentDialog` از JSX
+- شرط `!isCheckingPhone` از `isValid`
+- متن "در حال بررسی..." از دکمه
 
-تغییر تابع `getWizardStorageKey`:
-```typescript
-// قبل:
-export function getWizardStorageKey(phoneNumber?: string): string {
-  return phoneNumber ? `wizard_data_${phoneNumber}` : 'wizard_data_guest';
-}
+#### ۲. `src/components/wizard/WizardContainer.tsx`
+**حذف شود:**
+- ایمپورت `getAssessmentFromWordPress`
+- ایمپورت `useWordPressUser`
+- state های `isLoading` و `wpDataChecked`
+- استفاده از هوک `useWordPressUser`
+- useEffect بررسی کاربر WordPress (خطوط 58-64)
+- تابع `checkWpUserAssessment` (خطوط 67-107)
+- تابع `checkAssessmentStatus` (خطوط 109-139)
+- فراخوانی `checkAssessmentStatus` در `handleStartWizard`
+- صفحه loading
 
-// بعد:
-export const WIZARD_STORAGE_KEY = 'wizard_data';
+#### ۳. `src/components/wizard/ExistingAssessmentDialog.tsx`
+**حذف کامل فایل** - دیگر استفاده نمی‌شود
 
-export function getWizardStorageKey(): string {
-  return WIZARD_STORAGE_KEY;
-}
-```
+#### ۴. `src/services/wordpressDirectApi.ts`
+**حذف شود:**
+- تابع `getAssessmentFromWordPress` و تمام کد مربوطه
 
-#### ۲. به‌روزرسانی `src/components/wizard/WizardContext.tsx`
+تابع `saveAssessmentToWordPress` **باقی می‌ماند** چون در `AssessmentQuestions.tsx` برای ذخیره نتیجه ارزیابی استفاده می‌شود.
 
-حذف پارامتر `phoneNumber` از فراخوانی‌های `getWizardStorageKey`:
+#### ۵. `src/hooks/useWordPressUser.ts`
+**حذف کامل فایل** - دیگر استفاده نمی‌شود
 
-```typescript
-// loadFromLocalStorage - خط 74-75
-const loadFromLocalStorage = useCallback((): WizardStoredData | null => {
-  const key = getWizardStorageKey(); // بدون phoneNumber
-  // ...
-}
+---
 
-// saveToLocalStorage - خط 93-96
-const saveToLocalStorage = useCallback(() => {
-  const key = getWizardStorageKey(); // بدون phoneNumber
-  // ...
-}
-```
+### نتیجه نهایی
 
-#### ۳. به‌روزرسانی `src/components/wizard/WelcomePage.tsx`
+| قبل | بعد |
+|-----|-----|
+| بررسی لاگین WordPress | فقط localStorage |
+| بررسی شماره در دیتابیس | فقط localStorage |
+| نمایش دیالوگ "ارزیابی قبلی یافت شد" | مستقیم ادامه |
+| دریافت اطلاعات از دیتابیس | فقط localStorage |
+| ذخیره در دیتابیس WordPress | **همچنان ذخیره می‌شود** |
 
-تغییر فراخوانی `loadFromLocalStorage`:
-```typescript
-// خط 59
-const storedData = loadFromLocalStorage(); // بدون sanitizedPhone
-```
-
-### نتیجه
-
-- **قبل:** هر شماره تلفن = یک رکورد جدید
-- **بعد:** یک رکورد ثابت برای هر دستگاه/مرورگر
-
-### نکته مهم
-پس از اعمال تغییرات، رکوردهای قدیمی (با کلیدهای `wizard_data_*`) همچنان در localStorage باقی می‌مانند. اگر نیاز است پاکسازی شوند، می‌توان یک تابع migration اضافه کرد که در اولین بارگذاری، رکوردهای قدیمی را حذف کند.
+### منطق جدید
+- در صفحه خوش‌آمدگویی، فقط localStorage بررسی می‌شود
+- اگر `isEligible === true` در localStorage باشد، ارزیابی قبلی معتبر است
+- ذخیره نتیجه ارزیابی در دیتابیس WordPress همچنان انجام می‌شود (برای گزارش‌گیری)
 
