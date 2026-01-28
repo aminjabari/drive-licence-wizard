@@ -53,22 +53,21 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
     }
   }, [searchParams]);
 
-  // Check localStorage when phone number is valid
+  // Check localStorage on mount (one record per device)
   useEffect(() => {
-    if (isPhoneValid && sanitizedPhone && !localStorageChecked && !isLoggedIn) {
-      const storedData = loadFromLocalStorage(sanitizedPhone);
+    if (!localStorageChecked && !isLoggedIn) {
+      const storedData = loadFromLocalStorage();
       if (storedData) {
         setLocalName(storedData.userInfo.fullName);
         setLocalProvince(storedData.userInfo.province);
+        if (storedData.userInfo.phoneNumber) {
+          handlePhoneChange(storedData.userInfo.phoneNumber);
+        }
       }
       setLocalStorageChecked(true);
     }
-  }, [isPhoneValid, sanitizedPhone, localStorageChecked, isLoggedIn, loadFromLocalStorage]);
+  }, [localStorageChecked, isLoggedIn, loadFromLocalStorage]);
 
-  // Reset localStorage check when phone changes
-  useEffect(() => {
-    setLocalStorageChecked(false);
-  }, [sanitizedPhone]);
 
   const handleStart = async () => {
     if (!validatePhone()) return;

@@ -40,7 +40,7 @@ interface WizardContextType {
   resetAssessment: () => void;
   enteredViaQueryParam: boolean;
   setEnteredViaQueryParam: (entered: boolean) => void;
-  loadFromLocalStorage: (phoneNumber?: string) => WizardStoredData | null;
+  loadFromLocalStorage: () => WizardStoredData | null;
   saveToLocalStorage: () => void;
 }
 
@@ -71,8 +71,8 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   };
 
   // Load data from localStorage
-  const loadFromLocalStorage = useCallback((phoneNumber?: string): WizardStoredData | null => {
-    const key = getWizardStorageKey(phoneNumber);
+  const loadFromLocalStorage = useCallback((): WizardStoredData | null => {
+    const key = getWizardStorageKey();
     const storedData = getWithExpiry<WizardStoredData>(key);
     
     if (storedData) {
@@ -93,7 +93,7 @@ export function WizardProvider({ children }: { children: ReactNode }) {
   const saveToLocalStorage = useCallback(() => {
     if (!userInfo.phoneNumber) return;
     
-    const key = getWizardStorageKey(userInfo.phoneNumber);
+    const key = getWizardStorageKey();
     const dataToStore: WizardStoredData = {
       userInfo,
       assessmentAnswers,
