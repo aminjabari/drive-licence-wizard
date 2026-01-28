@@ -61,35 +61,3 @@ export async function saveAssessmentToWordPress(
     return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
   }
 }
-
-// Get assessment by phone number from WordPress (direct call)
-export async function getAssessmentFromWordPress(
-  phoneNumber: string
-): Promise<{ success: boolean; data?: WordPressAssessment | null; error?: string }> {
-  if (!WORDPRESS_API_URL) {
-    console.error('VITE_WORDPRESS_API_URL is not configured');
-    return { success: false, error: 'WordPress API URL not configured' };
-  }
-
-  try {
-    const response = await fetch(
-      `${WORDPRESS_API_URL}/wp-json/sadar/v1/assessments?phone_number=${encodeURIComponent(phoneNumber)}`
-    );
-
-    if (response.status === 404) {
-      return { success: true, data: null };
-    }
-
-    const result = await response.json();
-
-    if (!response.ok) {
-      console.error('Error getting from WordPress:', result);
-      return { success: false, error: result.message || 'WordPress API error' };
-    }
-
-    return { success: true, data: unwrapWordPressResponse<WordPressAssessment>(result) };
-  } catch (err) {
-    console.error('Error getting from WordPress:', err);
-    return { success: false, error: err instanceof Error ? err.message : 'Unknown error' };
-  }
-}
