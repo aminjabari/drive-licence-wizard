@@ -8,9 +8,6 @@ import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from 
 import { ChevronDown, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePhoneValidation } from '@/hooks/usePhoneValidation';
-import { useWordPressUser } from '@/hooks/useWordPressUser';
-import { getAssessmentFromWordPress } from '@/services/wordpressDirectApi';
-import { ExistingAssessmentDialog } from './ExistingAssessmentDialog';
 import { dispatchToWordPress } from '@/hooks/useWordPressEvents';
 import { getImageUrl } from '@/lib/media';
 
@@ -20,14 +17,11 @@ interface WelcomePageProps {
 
 export function WelcomePage({ onStart }: WelcomePageProps) {
   const { userInfo, setUserInfo, loadFromLocalStorage } = useWizard();
-  const { isLoggedIn } = useWordPressUser();
   const [searchParams] = useSearchParams();
   
   const [localName, setLocalName] = useState(userInfo.fullName);
   const [localProvince, setLocalProvince] = useState(userInfo.province);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [showExistingDialog, setShowExistingDialog] = useState(false);
-  const [isCheckingPhone, setIsCheckingPhone] = useState(false);
   const [localStorageChecked, setLocalStorageChecked] = useState(false);
   
   const { 
@@ -55,7 +49,7 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
 
   // Check localStorage on mount (one record per device)
   useEffect(() => {
-    if (!localStorageChecked && !isLoggedIn) {
+    if (!localStorageChecked) {
       const storedData = loadFromLocalStorage();
       if (storedData) {
         setLocalName(storedData.userInfo.fullName);
@@ -66,30 +60,11 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
       }
       setLocalStorageChecked(true);
     }
-  }, [localStorageChecked, isLoggedIn, loadFromLocalStorage]);
+  }, [localStorageChecked, loadFromLocalStorage]);
 
 
-  const handleStart = async () => {
+  const handleStart = () => {
     if (!validatePhone()) return;
-    
-    // If user is not logged in via WordPress, check if phone exists in WordPress database
-    if (!isLoggedIn) {
-      setIsCheckingPhone(true);
-      try {
-        const result = await getAssessmentFromWordPress(sanitizedPhone);
-
-        if (result.success && result.data && result.data.id) {
-          // Phone exists in WordPress database, show dialog
-          setShowExistingDialog(true);
-          setIsCheckingPhone(false);
-          return;
-        }
-      } catch (err) {
-        console.error('Error checking phone:', err);
-      } finally {
-        setIsCheckingPhone(false);
-      }
-    }
     
     const newUserInfo = { fullName: localName, phoneNumber: sanitizedPhone, province: localProvince };
     setUserInfo(newUserInfo);
@@ -116,7 +91,7 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
     setTimeout(() => buttonRef.current?.focus(), 100);
   };
 
-  const isValid = localName.trim().length > 0 && isPhoneValid && localProvince.length > 0 && !isCheckingPhone;
+  const isValid = localName.trim().length > 0 && isPhoneValid && localProvince.length > 0;
 
   return (
     <div className="flex flex-col h-[100dvh] bg-card max-w-[600px] mx-auto" dir="rtl">
@@ -226,14 +201,9 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
           disabled={!isValid}
           className="w-full h-12 rounded-full text-lg font-medium"
         >
-          {isCheckingPhone ? 'در حال بررسی...' : 'بزن بریم'}
+          بزن بریم
         </Button>
       </div>
-
-      <ExistingAssessmentDialog 
-        open={showExistingDialog} 
-        onClose={() => setShowExistingDialog(false)} 
-      />
     </div>
   );
 }
