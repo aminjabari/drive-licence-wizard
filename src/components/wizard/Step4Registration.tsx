@@ -1,4 +1,4 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { useWizard } from './WizardContext';
 import { WizardFooter } from './WizardFooter';
 import { useWordPressEvents } from '@/hooks/useWordPressEvents';
@@ -12,6 +12,7 @@ export function Step4Registration({ onPrev }: Step4RegistrationProps) {
   const { markStepComplete, enteredViaQueryParam } = useWizard();
   const { dispatch: dispatchWpEvent } = useWordPressEvents();
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (videoRef.current && !enteredViaQueryParam) {
@@ -24,12 +25,19 @@ export function Step4Registration({ onPrev }: Step4RegistrationProps) {
     }
   }, [enteredViaQueryParam]);
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
+    setIsLoading(true);
+    
     // Dispatch registration_clicked event to WordPress
     dispatchWpEvent('registration_clicked');
     
+    // Wait 2.5 seconds for event to be fully dispatched
+    await new Promise(resolve => setTimeout(resolve, 2500));
+    
     markStepComplete(4);
-    window.open('https://sadar.ir', '_blank');
+    window.open('https://sadar.ir/course/exam?utm_source=wizard&utm_medium=cta&utm_campaign=smart_card', '_blank');
+    
+    setIsLoading(false);
   };
 
   return (
@@ -65,6 +73,7 @@ export function Step4Registration({ onPrev }: Step4RegistrationProps) {
         showNext={false}
         actionLabel="ثبت‌نام در سایت سدار"
         onAction={handleRegister}
+        actionLoading={isLoading}
       />
     </>
   );

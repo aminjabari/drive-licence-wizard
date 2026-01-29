@@ -13,6 +13,7 @@ interface WizardFooterProps {
   showNext?: boolean;
   actionLabel?: string;
   onAction?: () => void;
+  actionLoading?: boolean;
 }
 
 export function WizardFooter({
@@ -26,6 +27,7 @@ export function WizardFooter({
   showNext = true,
   actionLabel,
   onAction,
+  actionLoading = false,
 }: WizardFooterProps) {
   const { currentStep } = useWizard();
 
@@ -66,9 +68,10 @@ export function WizardFooter({
       {actionLabel && onAction && (
         <Button
           onClick={onAction}
+          disabled={actionLoading}
           className="flex-1 h-12 rounded-full text-base font-medium"
         >
-          {actionLabel}
+          {actionLoading ? 'در حال ارسال...' : actionLabel}
         </Button>
       )}
     </div>
