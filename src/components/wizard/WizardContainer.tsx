@@ -6,7 +6,6 @@ import { Step1Assessment } from './Step1Assessment';
 import { Step2Documents } from './Step2Documents';
 import { Step3Process } from './Step3Process';
 import { Step4Registration } from './Step4Registration';
-import { useWordPressEvents } from '@/hooks/useWordPressEvents';
 import { useQueryParams } from '@/hooks/useQueryParams';
 import { getVideoUrl } from '@/lib/media';
 
@@ -49,8 +48,6 @@ function WizardContent() {
     setShowWelcome(false);
   };
 
-  const { dispatch: dispatchWpEvent } = useWordPressEvents();
-
   const handleNext = () => {
     // If user data is missing, redirect to welcome page
     if (!userInfo.phoneNumber) {
@@ -62,9 +59,6 @@ function WizardContent() {
     if (currentStep < 4) {
       const newStep = currentStep + 1;
       setCurrentStep(newStep);
-      
-      // Dispatch step_changed event to WordPress
-      dispatchWpEvent('step_changed', { currentStep: newStep });
     }
   };
 
@@ -79,9 +73,6 @@ function WizardContent() {
     if (currentStep > 1) {
       const newStep = currentStep - 1;
       setCurrentStep(newStep);
-      
-      // Dispatch step_changed event to WordPress
-      dispatchWpEvent('step_changed', { currentStep: newStep });
     }
   };
 
