@@ -79,7 +79,6 @@ export function WizardProvider({ children }: { children: ReactNode }) {
       setUserInfo(storedData.userInfo);
       setAssessmentAnswers(storedData.assessmentAnswers);
       setIsEligible(storedData.isEligible);
-      setCurrentStep(storedData.currentStep);
       setCompletedSteps(storedData.completedSteps);
       if (storedData.isEligible !== null) {
         setAssessmentStarted(true);
