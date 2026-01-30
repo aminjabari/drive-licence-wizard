@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { WizardProvider, useWizard } from './WizardContext';
 import { WelcomePage } from './WelcomePage';
 import { WizardHeader } from './WizardHeader';
@@ -19,17 +19,29 @@ function WizardContent() {
     setEnteredViaQueryParam
   } = useWizard();
 
-  // Preload video for step 4 when user reaches step 2 or beyond
-  const videoPreloadRef = useRef<HTMLVideoElement | null>(null);
+  // Sequential video preloading on wizard mount
   useEffect(() => {
-    if (currentStep >= 2 && !videoPreloadRef.current) {
+    const videoOrder = ['steps', 'cost', 'register'] as const;
+    let currentIndex = 0;
+
+    const preloadNextVideo = () => {
+      if (currentIndex >= videoOrder.length) return;
+      
+      const videoKey = videoOrder[currentIndex];
       const video = document.createElement('video');
       video.preload = 'auto';
-      video.src = getVideoUrl('register');
+      video.src = getVideoUrl(videoKey);
+      
+      video.addEventListener('canplaythrough', () => {
+        currentIndex++;
+        preloadNextVideo();
+      }, { once: true });
+      
       video.load();
-      videoPreloadRef.current = video;
-    }
-  }, [currentStep]);
+    };
+
+    preloadNextVideo();
+  }, []);
 
   // Check for step query param on mount
   useEffect(() => {
