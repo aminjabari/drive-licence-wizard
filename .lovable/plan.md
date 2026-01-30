@@ -1,118 +1,55 @@
 
-## برنامه اعمال تغییرات
+## برنامه حذف بازیابی مرحله از localStorage
 
-### ۱. تغییر آدرس سایت وردپرسی در `.env`
+### تغییر مورد نیاز
 
-```
-قبل: VITE_WORDPRESS_API_URL="https://test.aminjabari.com"
-بعد: VITE_WORDPRESS_API_URL="https://sadar.ir"
-```
+#### فایل: `src/components/wizard/WizardContext.tsx`
 
----
+**تغییر تابع `loadFromLocalStorage`:**
 
-### ۲. حذف ایونت `step_changed` از `WizardContainer.tsx`
-
-حذف ارسال ایونت در دو جای `handleNext` و `handlePrev`:
-
-**فایل:** `src/components/wizard/WizardContainer.tsx`
+حذف خط ست کردن `currentStep`:
 
 ```typescript
-// handleNext - حذف خط 67
-dispatchWpEvent('step_changed', { currentStep: newStep });
-
-// handlePrev - حذف خط 84
-dispatchWpEvent('step_changed', { currentStep: newStep });
-```
-
-همچنین می‌توان ایمپورت `useWordPressEvents` و متغیر `dispatchWpEvent` را حذف کرد چون دیگر استفاده نمی‌شود.
-
----
-
-### ۳. اصلاح لینک ثبت‌نام با UTM در `Step4Registration.tsx`
-
-**فایل:** `src/components/wizard/Step4Registration.tsx`
-
-تغییر آدرس و اضافه کردن UTM:
-```typescript
-// قبل:
-window.open('https://sadar.ir', '_blank');
+// قبل (خطوط 78-86):
+if (storedData) {
+  setUserInfo(storedData.userInfo);
+  setAssessmentAnswers(storedData.assessmentAnswers);
+  setIsEligible(storedData.isEligible);
+  setCurrentStep(storedData.currentStep);        // ← این خط حذف شود
+  setCompletedSteps(storedData.completedSteps);
+  if (storedData.isEligible !== null) {
+    setAssessmentStarted(true);
+  }
+}
 
 // بعد:
-window.open('https://sadar.ir/course/exam?utm_source=wizard&utm_medium=cta&utm_campaign=smart_card', '_blank');
-```
-
----
-
-### ۴. اضافه کردن تأخیر ۲.۵ ثانیه‌ای با حالت loading
-
-**فایل:** `src/components/wizard/WizardFooter.tsx`
-
-اضافه کردن prop جدید `actionLoading`:
-```typescript
-interface WizardFooterProps {
-  // ... existing props
-  actionLoading?: boolean;
+if (storedData) {
+  setUserInfo(storedData.userInfo);
+  setAssessmentAnswers(storedData.assessmentAnswers);
+  setIsEligible(storedData.isEligible);
+  setCompletedSteps(storedData.completedSteps);
+  if (storedData.isEligible !== null) {
+    setAssessmentStarted(true);
+  }
 }
 ```
 
-و استفاده در دکمه:
-```typescript
-<Button
-  onClick={onAction}
-  disabled={actionLoading}
-  className="flex-1 h-12 rounded-full text-base font-medium"
->
-  {actionLoading ? 'در حال ارسال...' : actionLabel}
-</Button>
-```
+---
 
-**فایل:** `src/components/wizard/Step4Registration.tsx`
+### نتیجه
 
-اضافه کردن state و تغییر `handleRegister`:
-```typescript
-const [isLoading, setIsLoading] = useState(false);
-
-const handleRegister = async () => {
-  setIsLoading(true);
-  
-  // Dispatch registration_clicked event to WordPress
-  dispatchWpEvent('registration_clicked');
-  
-  // Wait 2.5 seconds for event to be fully dispatched
-  await new Promise(resolve => setTimeout(resolve, 2500));
-  
-  markStepComplete(4);
-  window.open('https://sadar.ir/course/exam?utm_source=wizard&utm_medium=cta&utm_campaign=smart_card', '_blank');
-  
-  setIsLoading(false);
-};
-
-// در JSX:
-<WizardFooter
-  onPrev={onPrev}
-  showNext={false}
-  actionLabel="ثبت‌نام در سایت سدار"
-  onAction={handleRegister}
-  actionLoading={isLoading}
-/>
-```
+| داده | ذخیره می‌شود؟ | بازیابی می‌شود؟ |
+|------|--------------|----------------|
+| اطلاعات کاربر (نام، تلفن، استان) | ✅ | ✅ |
+| پاسخ‌های ارزیابی | ✅ | ✅ |
+| نتیجه واجد شرایط بودن | ✅ | ✅ |
+| مراحل تکمیل شده | ✅ | ✅ |
+| **مرحله فعلی** | ✅ | ❌ (همیشه از ۱ شروع) |
 
 ---
 
-### خلاصه تغییرات
+### توضیح
 
-| فایل | تغییر |
-|------|-------|
-| `.env` | تغییر URL به `https://sadar.ir` |
-| `WizardContainer.tsx` | حذف ارسال ایونت `step_changed` |
-| `Step4Registration.tsx` | اصلاح لینک + اضافه کردن loading |
-| `WizardFooter.tsx` | اضافه کردن prop `actionLoading` |
-
----
-
-### بخش فنی
-
-**UTM Parameters:**
-- `utm_source=wizard` - منبع: ویزارد کارت هوشمند
-- `utm_medium=cta` - نوع: دکمه Call-to-Action
-- `utm_campaign=smart_card` - کمپین: کارت هوشمند
+- `currentStep` همچنان در localStorage ذخیره می‌شود (برای احتمال استفاده آینده)
+- اما هنگام بازیابی، مرحله فعلی ست نمی‌شود
+- کاربر همیشه از مرحله ۱ شروع می‌کند، اما اطلاعات قبلی‌اش (نام، ارزیابی و...) موجود است
