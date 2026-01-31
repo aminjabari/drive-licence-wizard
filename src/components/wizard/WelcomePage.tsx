@@ -116,7 +116,7 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
             placeholder="نام و نام خانوادگی"
             value={localName}
             onChange={(e) => setLocalName(e.target.value)}
-            className="text-right bg-card border-border h-12 rounded-full px-6"
+            className="wizard-input text-right"
             autoComplete="name"
             name="name"
           />
@@ -128,11 +128,11 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
               value={localPhone}
               onChange={(e) => handlePhoneChange(e.target.value)}
               className={cn(
-                "text-right bg-card h-12 rounded-full px-6 transition-all border-border",
+                "wizard-input text-right",
                 hasPhoneError 
-                  ? "ring-2 ring-destructive ring-offset-2" 
+                  ? "!ring-2 !ring-destructive !ring-offset-2" 
                   : isPhoneValid 
-                    ? "ring-2 ring-primary ring-offset-2" 
+                    ? "!ring-2 !ring-primary !ring-offset-2" 
                     : ""
               )}
               dir="ltr"
@@ -154,7 +154,7 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
                   placeholder="انتخاب استان"
                   value={localProvince}
                   readOnly
-                  className="text-right bg-card border-border h-12 rounded-full px-6 cursor-pointer"
+                  className="wizard-input text-right cursor-pointer"
                   autoComplete="off"
                   name="address-level1"
                   onClick={() => setDrawerOpen(true)}
@@ -199,7 +199,7 @@ export function WelcomePage({ onStart }: WelcomePageProps) {
           ref={buttonRef}
           onClick={handleStart}
           disabled={!isValid}
-          className="w-full h-12 rounded-full text-lg font-medium"
+          className="wizard-button"
         >
           بزن بریم
         </Button>
