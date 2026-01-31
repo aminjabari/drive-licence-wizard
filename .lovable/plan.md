@@ -1,55 +1,44 @@
 
-## برنامه حذف بازیابی مرحله از localStorage
+## برنامه ارسال غیرهمزمان (Fire-and-Forget)
 
 ### تغییر مورد نیاز
 
-#### فایل: `src/components/wizard/WizardContext.tsx`
+#### فایل: `src/components/wizard/AssessmentQuestions.tsx`
 
-**تغییر تابع `loadFromLocalStorage`:**
-
-حذف خط ست کردن `currentStep`:
+**خط ۱۲۵ - حذف `await`:**
 
 ```typescript
-// قبل (خطوط 78-86):
-if (storedData) {
-  setUserInfo(storedData.userInfo);
-  setAssessmentAnswers(storedData.assessmentAnswers);
-  setIsEligible(storedData.isEligible);
-  setCurrentStep(storedData.currentStep);        // ← این خط حذف شود
-  setCompletedSteps(storedData.completedSteps);
-  if (storedData.isEligible !== null) {
-    setAssessmentStarted(true);
-  }
-}
+// قبل:
+await saveAssessmentToBackend(newAnswers as Record<string, string>, true);
 
 // بعد:
-if (storedData) {
-  setUserInfo(storedData.userInfo);
-  setAssessmentAnswers(storedData.assessmentAnswers);
-  setIsEligible(storedData.isEligible);
-  setCompletedSteps(storedData.completedSteps);
-  if (storedData.isEligible !== null) {
-    setAssessmentStarted(true);
-  }
-}
+saveAssessmentToBackend(newAnswers as Record<string, string>, true);
 ```
 
 ---
 
-### نتیجه
+### مقایسه رفتار
 
-| داده | ذخیره می‌شود؟ | بازیابی می‌شود؟ |
-|------|--------------|----------------|
-| اطلاعات کاربر (نام، تلفن، استان) | ✅ | ✅ |
-| پاسخ‌های ارزیابی | ✅ | ✅ |
-| نتیجه واجد شرایط بودن | ✅ | ✅ |
-| مراحل تکمیل شده | ✅ | ✅ |
-| **مرحله فعلی** | ✅ | ❌ (همیشه از ۱ شروع) |
+| وضعیت | قبل | بعد |
+|-------|-----|-----|
+| کاربر منتظر پاسخ وردپرس | ✅ بله | ❌ خیر |
+| ارسال اطلاعات به وردپرس | ✅ انجام می‌شود | ✅ انجام می‌شود |
+| تأخیر برای کاربر | ⏱️ بستگی به سرعت شبکه | ⚡ صفر |
+| مدیریت خطا | در UI | فقط در console |
 
 ---
 
-### توضیح
+### توضیح فنی
 
-- `currentStep` همچنان در localStorage ذخیره می‌شود (برای احتمال استفاده آینده)
-- اما هنگام بازیابی، مرحله فعلی ست نمی‌شود
-- کاربر همیشه از مرحله ۱ شروع می‌کند، اما اطلاعات قبلی‌اش (نام، ارزیابی و...) موجود است
+**Fire-and-Forget Pattern:**
+- تابع `saveAssessmentToBackend` همچنان اجرا می‌شود
+- اما کد منتظر نتیجه آن نمی‌ماند
+- خطاها فقط در console لاگ می‌شوند (که در حال حاضر هم همین‌طور است)
+- کاربر بلافاصله صفحه موفقیت را می‌بیند
+
+**مزایا:**
+- تجربه کاربری سریع‌تر
+- عدم وابستگی به سرعت پاسخ وردپرس
+
+**معایب احتمالی:**
+- اگر ارسال فیل شود، کاربر متوجه نمی‌شود (اما این در حال حاضر هم اهمیتی ندارد چون خطا فقط log می‌شود)
