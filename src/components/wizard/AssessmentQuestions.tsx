@@ -121,8 +121,8 @@ export function AssessmentQuestions({ onComplete, onDisqualify }: AssessmentQues
         setCurrentQuestion(currentQuestion + 1);
         setSelectedOption(null);
       } else {
-        // Save to backend when assessment is complete
-        await saveAssessmentToBackend(newAnswers as Record<string, string>, true);
+        // Save to backend when assessment is complete (fire-and-forget)
+        saveAssessmentToBackend(newAnswers as Record<string, string>, true);
         
         // Dispatch assessment_completed event to WordPress
         dispatchWpEvent('assessment_completed', {
