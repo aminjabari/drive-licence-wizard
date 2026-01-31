@@ -71,7 +71,7 @@ All colors MUST be HSL.
     --success-foreground: 145 100% 97%;
     --success-light: 145 60% 90%;
 
-    --font-sans: 'Vazirmatn', ui-sans-serif, system-ui, sans-serif;
+    --font-sans: 'IRANSans', 'Vazirmatn', ui-sans-serif, system-ui, sans-serif;
 
     --shadow-2xs: 0 1px 3px 0px hsl(0 0% 0% / 0.05);
 
